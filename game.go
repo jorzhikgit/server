@@ -5,16 +5,17 @@ import (
 )
 
 type Game struct {
-	Id int
-	Name string
+	Id             int
+	Name           string
 	AvailableItems []Item // items available when creating a board
-	Players []Player
-	Theme string // not a choice, just a suggestion from the Host
+	Players        []Player
+	Theme          string // not a choice, just a suggestion from the Host
 }
 
 type GameRepository interface {
 	Save(game Game)
 	FindById(id int) Game
+	FindHost() Player
 }
 
 // Creates a new game
@@ -23,10 +24,10 @@ func NewGame(name string, theme string, host Player) Game {
 	players = append(players, host)
 
 	return Game{
-		Id: 2,
-		Name: name,
-		Theme: theme,
-		Players: players,
+		Id:             2,
+		Name:           name,
+		Theme:          theme,
+		Players:        players,
 		AvailableItems: make([]Item, 0),
 	}
 }

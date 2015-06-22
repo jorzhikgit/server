@@ -1,13 +1,13 @@
 package main
 
 type Player struct {
-	Id int
-	Name string
+	Id     int
+	Name   string
 	IsHost bool
-	Board Board
+	Board  Board
 }
 
 type PlayerRepository interface {
-	Save(player Player)
+	Save(player Player) int // return an ID number for the saved player
 	FindById(id int) Player
 }

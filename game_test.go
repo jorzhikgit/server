@@ -44,15 +44,15 @@ func TestNewGame(t *testing.T) {
 func TestAddToAvailableItems(t *testing.T) {
 	Convey("Given a new game", t, func() {
 		host := Player{
-			Id: 1,
-			Name: "joey",
+			Id:     1,
+			Name:   "joey",
 			IsHost: true,
-			Board: Board{},
+			Board:  Board{},
 		}
 		game := NewGame("Barry Bingo", "All the funny things Barry does", host)
 
 		Convey("Add a new item to the available items", func() {
-			item := Item {Id: 1, Value: "fudge"}
+			item := Item{Id: 1, Value: "fudge"}
 			count, err := game.AddToAvailable(item)
 
 			Convey("There should be one item and no errors", func() {
@@ -66,16 +66,16 @@ func TestAddToAvailableItems(t *testing.T) {
 // TestAddToAvailableItems_Duplicate adds the same item twice
 func TestAddToAvailableItems_Duplicate(t *testing.T) {
 	Convey("Given a new game", t, func() {
-		host := Player {
-			Id: 1,
-			Name: "joey",
+		host := Player{
+			Id:     1,
+			Name:   "joey",
 			IsHost: true,
-			Board: Board{},
+			Board:  Board{},
 		}
 		game := NewGame("Barry Bingo", "stuff", host)
 
 		Convey("Add a new item to the available items", func() {
-			item := Item {Id: 1, Value: "fudge"}
+			item := Item{Id: 1, Value: "fudge"}
 			count, err := game.AddToAvailable(item)
 
 			Convey("There should be one item and no errors", func() {

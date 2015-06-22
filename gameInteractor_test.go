@@ -7,15 +7,6 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-// Player repository for testing
-type TestPlayerRepo struct{}
-
-func (pr *TestPlayerRepo) Save(player Player) {
-}
-func (pr *TestPlayerRepo) FindById(id int) Player {
-	return Player{}
-}
-
 // User repository for testing
 type TestUserRepo struct{}
 
@@ -35,19 +26,40 @@ func (ir *TestItemRepo) FindById(id int) Item {
 }
 
 // Game repository for testing
-type TestGameRepo struct{}
+type TestGameRepo struct {
+	game Game
+}
 
 func (gr *TestGameRepo) Save(game Game) {
 }
 func (gr *TestGameRepo) FindById(id int) Game {
 	return Game{}
 }
+func (gr *TestGameRepo) FindHost() Player {
+	for _, p := range gr.game.Players {
+		if p.IsHost == true {
+			return p
+		}
+	}
+
+	return Player{}
+}
 
 // Logging for testing
 type TestLogger struct{}
 
-func (log *TestLogger) Log(message string) error{
+func (log *TestLogger) Log(message string) error {
 	return errors.New(message)
+}
+
+func setupGameInteractor() GameInteractor {
+	userRepo := TestUserRepo{}
+	playerRepo := TestPlayerRepo{}
+	gameRepo := TestGameRepo{}
+	itemRepo := TestItemRepo{}
+	logger := TestLogger{}
+
+	return NewGameInteractor(&playerRepo, &userRepo, &itemRepo, &gameRepo, &logger)
 }
 
 // TestNewGameInteractor generates a new GameInteractor from inputs
@@ -63,14 +75,39 @@ func TestNewGameInteractor(t *testing.T) {
 		gameInter := NewGameInteractor(&playerRepo, &userRepo, &itemRepo, &gameRepo, &logger)
 
 		Convey("Should be equal to custom GameInteractor", func() {
-			customGame := GameInteractor {
+			customGame := GameInteractor{
 				PlayerRepo: &playerRepo,
-				GameRepo: &gameRepo,
-				UserRepo: &userRepo,
-				ItemRepo: &itemRepo,
-				Logger: &logger,
+				GameRepo:   &gameRepo,
+				UserRepo:   &userRepo,
+				ItemRepo:   &itemRepo,
+				Logger:     &logger,
 			}
 			So(gameInter, ShouldResemble, customGame)
 		})
+	})
+}
+
+// TestCreateGame creates a new game using a game interactor and host
+func TestCreateGame(t *testing.T) {
+	Convey("Using a new GameInteractor and a new host", t, func() {
+		gameInter := setupGameInteractor()
+		user := User{
+			Id: 1,
+			Player: Player{
+				Id:     1,
+				Name:   "joey",
+				IsHost: true,
+			},
+		}
+
+		Convey("Create a new game", func() {
+			err := gameInter.CreateGame(user)
+
+			Convey("And have the host be joey", func() {
+				So(err, ShouldBeNil)
+				So(gameInter.GameRepo.FindHost(), ShouldResemble, user.Player)
+			})
+		})
+
 	})
 }
