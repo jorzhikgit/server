@@ -62,3 +62,36 @@ func TestAddToAvailableItems(t *testing.T) {
 		})
 	})
 }
+
+// TestAddToAvailableItems_Duplicate adds the same item twice
+func TestAddToAvailableItems_Duplicate(t *testing.T) {
+	Convey("Given a new game", t, func() {
+		host := Player {
+			Id: 1,
+			Name: "joey",
+			IsHost: true,
+			Board: Board{},
+		}
+		game := NewGame("Barry Bingo", "stuff", host)
+
+		Convey("Add a new item to the available items", func() {
+			item := Item {Id: 1, Value: "fudge"}
+			count, err := game.AddToAvailable(item)
+
+			Convey("There should be one item and no errors", func() {
+				So(count, ShouldEqual, 1)
+				So(err, ShouldBeNil)
+			})
+
+			Convey("Create a new item with the same value and add to list", func() {
+				item2 := Item{Id: 2, Value: "fudge"}
+				count, err = game.AddToAvailable(item2)
+
+				Convey("There should be one item and an error", func() {
+					So(count, ShouldEqual, 1)
+					So(err, ShouldNotBeNil)
+				})
+			})
+		})
+	})
+}
