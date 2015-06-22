@@ -11,4 +11,3 @@ type PlayerRepository interface {
 	Save(player Player)
 	FindById(id int) Player
 }
-
