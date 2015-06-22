@@ -1,5 +1,5 @@
 package main
 
-type Logging interface{
+type Logging interface {
 	Log(message string) error
 }

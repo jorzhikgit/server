@@ -1,7 +1,7 @@
 package main
 
 type Item struct {
-	Id int
+	Id    int
 	Value string
 }
 

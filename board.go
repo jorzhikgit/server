@@ -7,7 +7,7 @@ import (
 const BOARD_SIZE int = 25
 
 type Board struct {
-	Id int
+	Id    int
 	Items []Item // items on a board
 }
 
@@ -19,7 +19,7 @@ type BoardRepository interface {
 // Creates a new board
 func NewBoard() Board {
 	freeItem := Item{
-		Id: 0,
+		Id:    0,
 		Value: "FREE",
 	}
 
@@ -27,7 +27,7 @@ func NewBoard() Board {
 	items = append(items, freeItem)
 
 	return Board{
-		Id: 2,
+		Id:    2,
 		Items: items,
 	}
 }

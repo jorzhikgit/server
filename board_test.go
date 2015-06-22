@@ -1,13 +1,13 @@
 package main
 
 import (
-	"testing"
-	"strconv"
 	. "github.com/smartystreets/goconvey/convey"
+	"strconv"
+	"testing"
 )
 
 // TestNewBoard creates a new board and confirms that a FREE space is already existing
-func TestNewBoard(t * testing.T) {
+func TestNewBoard(t *testing.T) {
 	Convey("Given a new board", t, func() {
 		board := NewBoard()
 
@@ -23,7 +23,7 @@ func TestAddItemToBoard_NoError(t *testing.T) {
 	Convey("Given a blank board and a valid item", t, func() {
 		board := NewBoard()
 		item := Item{
-			Id: 1,
+			Id:    1,
 			Value: "Says boom",
 		}
 
@@ -43,9 +43,9 @@ func TestAddItemToBoard_Overfill(t *testing.T) {
 		board := NewBoard()
 
 		Convey("Fill it with various items", func() {
-			for i := 0; i < BOARD_SIZE - 1; i++ {
-				item := Item {
-					Id: i,
+			for i := 0; i < BOARD_SIZE-1; i++ {
+				item := Item{
+					Id:    i,
 					Value: strconv.Itoa(i),
 				}
 				board.Items = append(board.Items, item)
@@ -56,7 +56,7 @@ func TestAddItemToBoard_Overfill(t *testing.T) {
 			})
 
 			Convey("Add a new item to full board should fail", func() {
-				item := Item {Id: 100, Value: "too far"}
+				item := Item{Id: 100, Value: "too far"}
 				err := board.Add(item)
 				So(err, ShouldNotBeNil)
 			})
@@ -70,7 +70,7 @@ func TestAddItemToBoard_Duplicate(t *testing.T) {
 		board := NewBoard()
 
 		Convey("Create a new item and add it to the board", func() {
-			item := Item {Id: 22, Value: "duplicate"}
+			item := Item{Id: 22, Value: "duplicate"}
 			err := board.Add(item)
 
 			Convey("There should be no error and two items on the board", func() {
