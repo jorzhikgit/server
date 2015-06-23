@@ -30,10 +30,9 @@ type TestGameRepo struct {
 	game Game
 }
 
-func (gr *TestGameRepo) Save(game Game) {
-}
-func (gr *TestGameRepo) FindById(id int) Game {
-	return Game{}
+func (gr *TestGameRepo) Save(game Game) (int, error) { return 0, nil }
+func (gr *TestGameRepo) FindById(id int) (Game, error) {
+	return Game{}, nil
 }
 func (gr *TestGameRepo) FindHost() Player {
 	return Player{

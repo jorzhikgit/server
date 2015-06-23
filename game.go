@@ -13,8 +13,8 @@ type Game struct {
 }
 
 type GameRepository interface {
-	Save(game Game)
-	FindById(id int) Game
+	Save(game Game) (int, error)
+	FindById(id int) (Game, error)
 }
 
 // Creates a new game

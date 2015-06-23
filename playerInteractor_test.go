@@ -14,17 +14,17 @@ type TestPlayerRepo struct {
 func (pr *TestPlayerRepo) Save(player Player) (int, error) {
 	return 1, nil
 }
-func (pr *TestPlayerRepo) FindById(id int) Player {
+func (pr *TestPlayerRepo) FindById(id int) (Player, error) {
 	if id == 1 {
 		return Player{
 			Id:     1,
 			Name:   "joey",
 			IsHost: true,
 			Board:  Board{},
-		}
+		}, nil
 	}
 
-	return Player{}
+	return Player{}, nil
 }
 
 // TestNewPlayerInteractor creates a new object to manage players

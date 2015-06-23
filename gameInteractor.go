@@ -33,7 +33,12 @@ func (gi *GameInteractor) CreateGame(host string) (Game, error) {
 	player := gi.PlayerInteractor.CreateHost(host)
 	gi.Game = NewGame("", "", player)
 
-	gi.GameRepo.Save(gi.Game)
+	gameId, err := gi.GameRepo.Save(gi.Game)
+	if err != nil {
+		return Game{}, err
+	}
+
+	gi.Game.Id = gameId
 
 	return gi.Game, nil
 }
