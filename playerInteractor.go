@@ -9,3 +9,19 @@ func NewPlayerInteractor(pr PlayerRepository) PlayerInteractor {
 		playerRepo: pr,
 	}
 }
+
+func (p *PlayerInteractor) CreateNewPlayer(name string, isHost bool) Player {
+	player := Player {
+		Name: name,
+		IsHost: isHost,
+	}
+
+	newId, err := p.playerRepo.Save(player)
+	if err != nil {
+		return Player{}
+	}
+
+	player.Id = newId
+
+	return player
+}

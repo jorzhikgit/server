@@ -8,6 +8,6 @@ type Player struct {
 }
 
 type PlayerRepository interface {
-	Save(player Player) int // return an ID number for the saved player
+	Save(player Player) (int, error) // return an ID number for the saved player
 	FindById(id int) Player
 }
