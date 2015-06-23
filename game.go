@@ -15,7 +15,6 @@ type Game struct {
 type GameRepository interface {
 	Save(game Game)
 	FindById(id int) Game
-	FindHost() Player
 }
 
 // Creates a new game
@@ -43,4 +42,14 @@ func (game *Game) AddToAvailable(item Item) (int, error) {
 
 	game.AvailableItems = append(game.AvailableItems, item)
 	return len(game.AvailableItems), nil
+}
+
+func (game *Game) GetHost() (Player, error) {
+	for i := 0; i < len(game.Players); i++ {
+		if game.Players[i].IsHost == true {
+			return game.Players[i], nil
+		}
+	}
+
+	return Player{}, errors.New("Unable to finda  host")
 }
