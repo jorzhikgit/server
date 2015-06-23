@@ -7,7 +7,7 @@ import (
 )
 
 // Fake player repo for testing
-type TestPlayerRepo struct{
+type TestPlayerRepo struct {
 	player Player
 }
 
@@ -44,7 +44,7 @@ func TestCreateNewPlayer(t *testing.T) {
 		playerInter := NewPlayerInteractor(&TestPlayerRepo{})
 
 		Convey("Create a new player", func() {
-			player := playerInter.CreateNewPlayer("joey",false)
+			player := playerInter.CreateNewPlayer("joey", false)
 
 			Convey("With a username of joey", func() {
 				So(player.Name, ShouldEqual, "joey")
@@ -52,6 +52,26 @@ func TestCreateNewPlayer(t *testing.T) {
 
 			Convey("And is not a host", func() {
 				So(player.IsHost, ShouldEqual, false)
+			})
+		})
+	})
+}
+
+// TestCreateNewHost creates a new player that is designated as the host
+func TestCreateNewHost(t *testing.T) {
+	Convey("With a new player interactor", t, func() {
+		playerInter := NewPlayerInteractor(&TestPlayerRepo{})
+
+		Convey("Create a new host", func() {
+			username := "joey"
+			player := playerInter.CreateHost(username)
+
+			Convey("With a username of joey", func() {
+				So(player.Name, ShouldEqual, username)
+			})
+
+			Convey("And is a host", func() {
+				So(player.IsHost, ShouldEqual, true)
 			})
 		})
 	})

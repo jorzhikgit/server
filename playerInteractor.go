@@ -11,8 +11,8 @@ func NewPlayerInteractor(pr PlayerRepository) PlayerInteractor {
 }
 
 func (p *PlayerInteractor) CreateNewPlayer(name string, isHost bool) Player {
-	player := Player {
-		Name: name,
+	player := Player{
+		Name:   name,
 		IsHost: isHost,
 	}
 
@@ -24,4 +24,8 @@ func (p *PlayerInteractor) CreateNewPlayer(name string, isHost bool) Player {
 	player.Id = newId
 
 	return player
+}
+
+func (p *PlayerInteractor) CreateHost(name string) Player {
+	return p.CreateNewPlayer(name, true)
 }
