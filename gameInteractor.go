@@ -27,7 +27,11 @@ func NewGameInteractor(
 // CreateGame creates a new game from the host's username
 func (gi *GameInteractor) CreateGame(host string) (Game, error) {
 
-	player := gi.PlayerInteractor.CreateHost(host)
+	player, err := gi.PlayerInteractor.CreateHost(host)
+	if err != nil {
+		return Game{}, err
+	}
+
 	gi.Game = NewGame("", "", player)
 
 	gameId, err := gi.GameRepo.Save(gi.Game)

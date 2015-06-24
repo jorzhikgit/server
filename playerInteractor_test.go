@@ -52,7 +52,7 @@ func TestCreateNewPlayer(t *testing.T) {
 		playerInter := NewPlayerInteractor(&TestPlayerRepo{})
 
 		Convey("Create a new player", func() {
-			player := playerInter.CreateNewPlayer("joey", false)
+			player, err := playerInter.CreateNewPlayer("joey", false)
 
 			Convey("With a username of joey", func() {
 				So(player.Name, ShouldEqual, "joey")
@@ -60,6 +60,10 @@ func TestCreateNewPlayer(t *testing.T) {
 
 			Convey("And is not a host", func() {
 				So(player.IsHost, ShouldEqual, false)
+			})
+
+			Convey("And there is no error", func() {
+				So(err, ShouldBeNil)
 			})
 		})
 	})
@@ -72,7 +76,7 @@ func TestCreateNewHost(t *testing.T) {
 
 		Convey("Create a new host", func() {
 			username := "joey"
-			player := playerInter.CreateHost(username)
+			player, err := playerInter.CreateHost(username)
 
 			Convey("With a username of joey", func() {
 				So(player.Name, ShouldEqual, username)
@@ -81,12 +85,32 @@ func TestCreateNewHost(t *testing.T) {
 			Convey("And is a host", func() {
 				So(player.IsHost, ShouldEqual, true)
 			})
+
+			Convey("And there is no error", func() {
+				So(err, ShouldBeNil)
+			})
 		})
 	})
 }
 
 // TestCreateNewInvalidPlayer attempts to create a new player but should be an error
 func TestCreateNewInvalidPlayer(t *testing.T) {
+	Convey("With a new player interactor", t, func() {
+		playerInter := NewPlayerInteractor(&TestPlayerRepo{})
+
+		Convey("Create a new player with no username", func() {
+			username := ""
+			player, err := playerInter.CreateNewPlayer(username, false)
+
+			Convey("Unitialized Player should be returned", func() {
+				So(player, ShouldResemble, (Player{}))
+			})
+
+			Convey("Error should be returned", func() {
+				So(err, ShouldNotBeNil)
+			})
+		})
+	})
 }
 
 // TestSavePlayers attempts to save several new players
