@@ -75,7 +75,7 @@ func (g *GameDbRepo) savePlayers(gameId int, players ...Player) ([]Player, []err
 func (g *GameDbRepo) FindById(id int) (Game, error) {
 
 	rows, err := g.Conn.Query(
-		"SELECT id, name, theme FROM games WHERE id = ?",
+		"SELECT g.id, g.name, g.theme, p.id, p.name, p.is_host FROM games g INNER JOIN `games_players` gp ON gp.game_id = g.id INNER JOIN players p ON p.id = gp.player_id WHERE g.id = ? ORDER BY g.id",
 		id)
 	if err != nil {
 		return Game{}, err
@@ -83,14 +83,28 @@ func (g *GameDbRepo) FindById(id int) (Game, error) {
 	defer rows.Close()
 
 	foundGame := Game{}
+	foundPlayers := make([]Player, 0)
 	for rows.Next() {
-		if foundGame.Id == 0 {
-			err := rows.Scan(&foundGame.Id, &foundGame.Name, &foundGame.Theme)
-			if err != nil {
-				return Game{}, err
-			}
+
+		var gameId, playerId int
+		var gameName, gameTheme, playerName string
+		var isHost bool
+		err := rows.Scan(&gameId, &gameName, &gameTheme, &playerId, &playerName, &isHost)
+		if err != nil {
+			return foundGame, err
 		}
+
+		// set game info if first record
+		if foundGame.Id == 0 {
+			foundGame.Id = gameId
+			foundGame.Name = gameName
+			foundGame.Theme = gameTheme
+		}
+
+		foundPlayers = append(foundPlayers, Player{Id: playerId, Name: playerName, IsHost: isHost})
 	}
+
+	foundGame.Players = foundPlayers
 
 	err = rows.Err()
 	if err != nil {
@@ -98,4 +112,34 @@ func (g *GameDbRepo) FindById(id int) (Game, error) {
 	}
 
 	return foundGame, nil
+}
+
+// FindPlayersByGame finds all players associated with the selected game
+func (g *GameDbRepo) FindPlayersByGame(gameId int) ([]Player, error) {
+	foundPlayers := make([]Player, 0)
+
+	rows, err := g.Conn.Query(
+		"SELECT p.id, p.name, p.is_host FROM `players` p INNER JOIN `games_players` gp ON gp.player_id = p.id WHERE gp.game_id = ?",
+		gameId)
+	if err != nil {
+		return foundPlayers, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		player := Player{}
+		err := rows.Scan(&player.Id, &player.Name, &player.IsHost)
+		if err != nil {
+			return foundPlayers, err
+		}
+
+		foundPlayers = append(foundPlayers, player)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return foundPlayers, err
+	}
+
+	return foundPlayers, nil
 }

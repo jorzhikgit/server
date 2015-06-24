@@ -15,6 +15,9 @@ type Game struct {
 type GameRepository interface {
 	Save(game Game) (int, error)
 	FindById(id int) (Game, error)
+
+	// Player handling
+	FindPlayersByGame(gameId int) ([]Player, error)
 }
 
 // Creates a new game
