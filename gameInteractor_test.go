@@ -25,6 +25,7 @@ func (gr *BadGameRepo) Save(game Game) (int, error) { return 0, errors.New("Unab
 func (gr *BadGameRepo) FindById(id int) (Game, error) {
 	return Game{}, errors.New("Unable to find game")
 }
+func (gr *BadGameRepo) FindPlayersByGame(gameId int) ([]Player, error) { return make([]Player, 0), nil }
 
 // Game repository for testing
 type TestGameRepo struct {
@@ -43,6 +44,7 @@ func (gr *TestGameRepo) FindHost() Player {
 		Board:  Board{},
 	}
 }
+func (gr *TestGameRepo) FindPlayersByGame(gameId int) ([]Player, error) { return make([]Player, 0), nil }
 
 // Logging for testing
 type TestLogger struct{}
