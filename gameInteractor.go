@@ -4,7 +4,6 @@ package main
 
 type GameInteractor struct {
 	PlayerInteractor PlayerInteractor
-	UserRepo         UserRepository
 	ItemRepo         ItemRepository
 	GameRepo         GameRepository
 	Game             Game
@@ -13,14 +12,12 @@ type GameInteractor struct {
 
 func NewGameInteractor(
 	pi PlayerInteractor,
-	ur UserRepository,
 	ir ItemRepository,
 	gr GameRepository,
 	log Logging) GameInteractor {
 
 	return GameInteractor{
 		PlayerInteractor: pi,
-		UserRepo:         ur,
 		ItemRepo:         ir,
 		GameRepo:         gr,
 		Logger:           log,
@@ -41,4 +38,14 @@ func (gi *GameInteractor) CreateGame(host string) (Game, error) {
 	gi.Game.Id = gameId
 
 	return gi.Game, nil
+}
+
+// SaveGame saves the current game by acting as a wrapper over the repository
+func (gi *GameInteractor) SaveGame() error {
+	_, err := gi.GameRepo.Save(gi.Game)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

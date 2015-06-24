@@ -7,15 +7,6 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-// User repository for testing
-type TestUserRepo struct{}
-
-func (ur *TestUserRepo) Save(user User) {
-}
-func (ur *TestUserRepo) FindById(id int) User {
-	return User{}
-}
-
 // Item repository for testing
 type TestItemRepo struct{}
 
@@ -23,6 +14,16 @@ func (ir *TestItemRepo) Save(item Item) {
 }
 func (ir *TestItemRepo) FindById(id int) Item {
 	return Item{}
+}
+
+// Bad game repository, only returns errors
+type BadGameRepo struct {
+	game Game
+}
+
+func (gr *BadGameRepo) Save(game Game) (int, error) { return 0, errors.New("Unable to save game") }
+func (gr *BadGameRepo) FindById(id int) (Game, error) {
+	return Game{}, errors.New("Unable to find game")
 }
 
 // Game repository for testing
@@ -51,32 +52,29 @@ func (log *TestLogger) Log(message string) error {
 }
 
 func setupGameInteractor() GameInteractor {
-	userRepo := TestUserRepo{}
 	playerInteractor := NewPlayerInteractor(&TestPlayerRepo{})
 	gameRepo := TestGameRepo{}
 	itemRepo := TestItemRepo{}
 	logger := TestLogger{}
 
-	return NewGameInteractor(playerInteractor, &userRepo, &itemRepo, &gameRepo, &logger)
+	return NewGameInteractor(playerInteractor, &itemRepo, &gameRepo, &logger)
 }
 
 // TestNewGameInteractor generates a new GameInteractor from inputs
 func TestNewGameInteractor(t *testing.T) {
 
 	Convey("Create a new GameInteractor", t, func() {
-		userRepo := TestUserRepo{}
 		playerInteractor := NewPlayerInteractor(&TestPlayerRepo{})
 		gameRepo := TestGameRepo{}
 		itemRepo := TestItemRepo{}
 		logger := TestLogger{}
 
-		gameInter := NewGameInteractor(playerInteractor, &userRepo, &itemRepo, &gameRepo, &logger)
+		gameInter := NewGameInteractor(playerInteractor, &itemRepo, &gameRepo, &logger)
 
 		Convey("Should be equal to custom GameInteractor", func() {
 			customGame := GameInteractor{
 				PlayerInteractor: playerInteractor,
 				GameRepo:         &gameRepo,
-				UserRepo:         &userRepo,
 				ItemRepo:         &itemRepo,
 				Logger:           &logger,
 			}
@@ -128,6 +126,28 @@ func TestGetHost(t *testing.T) {
 				host, err := game.GetHost()
 				So(err, ShouldBeNil)
 				So(host.Name, ShouldEqual, username)
+			})
+		})
+	})
+}
+
+// TestSaveGame saves the game to the database
+func TestSaveGame(t *testing.T) {
+	Convey("Using a new GameInteractor and a host username", t, func() {
+		gameInter := setupGameInteractor()
+		username := "joey"
+
+		Convey("Create a new game", func() {
+			game, err := gameInter.CreateGame(username)
+
+			Convey("Where the game has no name", func() {
+				So(err, ShouldBeNil)
+				So(game.Name, ShouldEqual, "")
+			})
+
+			Convey("Save the game", func() {
+				err := gameInter.SaveGame()
+				So(err, ShouldBeNil)
 			})
 		})
 	})
