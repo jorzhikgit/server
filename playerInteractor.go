@@ -1,5 +1,9 @@
 package main
 
+import (
+	"errors"
+)
+
 type PlayerInteractor struct {
 	playerRepo PlayerRepository
 }
@@ -20,12 +24,12 @@ func (p *PlayerInteractor) CreateNewPlayer(name string, isHost bool) Player {
 		IsHost: isHost,
 	}
 
-	newId, err := p.playerRepo.Save(player)
-	if err != nil {
+	savedPlayers, errList := p.playerRepo.Save(player)
+	if len(errList) > 0 {
 		return Player{}
 	}
 
-	player.Id = newId
+	player.Id = savedPlayers[0].Id
 
 	return player
 }
@@ -35,4 +39,15 @@ func (p *PlayerInteractor) CreateNewPlayer(name string, isHost bool) Player {
 // An empty Player is returned if there is an error
 func (p *PlayerInteractor) CreateHost(name string) Player {
 	return p.CreateNewPlayer(name, true)
+}
+
+// SavePlayers takes a slice of players and saves them all through the
+// repository.
+func (p *PlayerInteractor) SavePlayers(Players ...Player) error {
+	_, err := p.playerRepo.Save(Players...)
+	if len(err) > 0 {
+		return errors.New("Unable to save some players")
+	}
+
+	return nil
 }

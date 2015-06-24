@@ -6,13 +6,21 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+// list of players for testing
+var playerSlice []Player
+
 // Fake player repo for testing
 type TestPlayerRepo struct {
 	player Player
 }
 
-func (pr *TestPlayerRepo) Save(player Player) (int, error) {
-	return 1, nil
+func (pr *TestPlayerRepo) Save(player ...Player) ([]Player, []error) {
+	players := make([]Player, 0)
+	players = append(players, Player{Id: 1, Name: "joey", IsHost: true})
+
+	errorList := make([]error, 0)
+
+	return players, errorList
 }
 func (pr *TestPlayerRepo) FindById(id int) (Player, error) {
 	if id == 1 {
@@ -79,4 +87,30 @@ func TestCreateNewHost(t *testing.T) {
 
 // TestCreateNewInvalidPlayer attempts to create a new player but should be an error
 func TestCreateNewInvalidPlayer(t *testing.T) {
+}
+
+// TestSavePlayers attempts to save several new players
+func TestSavePlayers(t *testing.T) {
+	Convey("With a new player interactor and three players", t, func() {
+		playerInter := NewPlayerInteractor(&TestPlayerRepo{})
+		a := Player{
+			Name:   "player a",
+			IsHost: false,
+		}
+		b := Player{
+			Name:   "player b",
+			IsHost: true,
+		}
+		c := Player{
+			Name:   "player c",
+			IsHost: false,
+		}
+		playerSlice = []Player{a, b, c}
+
+		Convey("Save players", func() {
+			players, errList := playerInter.playerRepo.Save(playerSlice...)
+			So(len(errList), ShouldEqual, 0)
+			So(len(players), ShouldEqual, 1)
+		})
+	})
 }
