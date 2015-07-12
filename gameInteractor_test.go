@@ -90,7 +90,6 @@ func TestCreateGame(t *testing.T) {
 	Convey("Using a new GameInteractor and a new host", t, func() {
 		gameInter := setupGameInteractor()
 		user := User{
-			Id: 1,
 			Player: Player{
 				Id:     1,
 				Name:   "joey",
@@ -99,11 +98,11 @@ func TestCreateGame(t *testing.T) {
 		}
 
 		Convey("Create a new game", func() {
-			_, err := gameInter.CreateGame(user.Player.Name)
+			_, err := gameInter.CreateGame(user.Player.Name, &user)
 
 			Convey("And have the host be joey", func() {
 				So(err, ShouldBeNil)
-				So(gameInter.Game.Players[0], ShouldResemble, user.Player)
+				So(gameInter.Game.Users[0], ShouldResemble, &user)
 			})
 		})
 
@@ -115,9 +114,16 @@ func TestGetHost(t *testing.T) {
 	Convey("Using a new GameInteractor and a new host", t, func() {
 		gameInter := setupGameInteractor()
 		username := "joey"
+		user := User{
+			Player: Player{
+				Id:     1,
+				Name:   username,
+				IsHost: true,
+			},
+		}
 
 		Convey("Create a new game", func() {
-			game, err := gameInter.CreateGame(username)
+			game, err := gameInter.CreateGame(username, &user)
 
 			Convey("Where the game has not name", func() {
 				So(err, ShouldBeNil)
@@ -138,9 +144,16 @@ func TestSaveGame(t *testing.T) {
 	Convey("Using a new GameInteractor and a host username", t, func() {
 		gameInter := setupGameInteractor()
 		username := "joey"
+		user := User{
+			Player: Player{
+				Id:     1,
+				Name:   username,
+				IsHost: true,
+			},
+		}
 
 		Convey("Create a new game", func() {
-			game, err := gameInter.CreateGame(username)
+			game, err := gameInter.CreateGame(username, &user)
 
 			Convey("Where the game has no name", func() {
 				So(err, ShouldBeNil)

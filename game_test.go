@@ -8,19 +8,21 @@ import (
 // TestNewGame creates a new game
 func TestNewGame(t *testing.T) {
 	Convey("Given a new game", t, func() {
-		host := Player{
-			Id:     1,
-			Name:   "joey",
-			IsHost: true,
-			Board:  Board{},
+		host := User{
+			Player: Player{
+				Id:     1,
+				Name:   "joey",
+				IsHost: true,
+				Board:  Board{},
+			},
 		}
-		game := NewGame("Barry Bingo", "All the funny things Barry does", host)
+		game := NewGame("Barry Bingo", "All the funny things Barry does", &host)
 
 		Convey("There should be a host", func() {
 			host := Player{}
-			for _, player := range game.Players {
-				if player.IsHost == true {
-					host = player
+			for _, player := range game.Users {
+				if player.Player.IsHost == true {
+					host = player.Player
 				}
 			}
 			So(host, ShouldNotResemble, Player{})
@@ -43,13 +45,15 @@ func TestNewGame(t *testing.T) {
 // TestAddToAvailableItems adds a new item to the list of available itmes
 func TestAddToAvailableItems(t *testing.T) {
 	Convey("Given a new game", t, func() {
-		host := Player{
-			Id:     1,
-			Name:   "joey",
-			IsHost: true,
-			Board:  Board{},
+		host := User{
+			Player: Player{
+				Id:     1,
+				Name:   "joey",
+				IsHost: true,
+				Board:  Board{},
+			},
 		}
-		game := NewGame("Barry Bingo", "All the funny things Barry does", host)
+		game := NewGame("Barry Bingo", "All the funny things Barry does", &host)
 
 		Convey("Add a new item to the available items", func() {
 			item := Item{Id: 1, Value: "fudge"}
@@ -66,13 +70,15 @@ func TestAddToAvailableItems(t *testing.T) {
 // TestAddToAvailableItems_Duplicate adds the same item twice
 func TestAddToAvailableItems_Duplicate(t *testing.T) {
 	Convey("Given a new game", t, func() {
-		host := Player{
-			Id:     1,
-			Name:   "joey",
-			IsHost: true,
-			Board:  Board{},
+		host := User{
+			Player: Player{
+				Id:     1,
+				Name:   "joey",
+				IsHost: true,
+				Board:  Board{},
+			},
 		}
-		game := NewGame("Barry Bingo", "stuff", host)
+		game := NewGame("Barry Bingo", "stuff", &host)
 
 		Convey("Add a new item to the available items", func() {
 			item := Item{Id: 1, Value: "fudge"}

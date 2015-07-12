@@ -1,8 +1,8 @@
 package main
 
 type User struct {
-	Id     int
 	Player Player
+	Connection Connection
 }
 
 type UserRepository interface {

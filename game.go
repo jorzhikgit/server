@@ -8,8 +8,29 @@ type Game struct {
 	Id             int
 	Name           string
 	AvailableItems []Item // items available when creating a board
-	Players        []Player
+	Users          []*User
 	Theme          string // not a choice, just a suggestion from the Host
+}
+
+type GameList struct {
+	allGames map[int]Game
+}
+
+func NewGameList() GameList {
+	return GameList{
+		allGames: make(map[int]Game),
+	}
+}
+
+func (rg *GameList) AddGame(Game Game) error {
+	if _, ok := rg.allGames[Game.Id]; ok {
+		return errors.New("Game already added")
+	}
+
+	rg.allGames[Game.Id] = Game
+
+	return nil
+
 }
 
 type GameRepository interface {
@@ -21,15 +42,15 @@ type GameRepository interface {
 }
 
 // Creates a new game
-func NewGame(name string, theme string, host Player) Game {
-	players := make([]Player, 0, 8)
+func NewGame(name string, theme string, host *User) Game {
+	players := make([]*User, 0, 8)
 	players = append(players, host)
 
 	return Game{
 		Id:             2,
 		Name:           name,
 		Theme:          theme,
-		Players:        players,
+		Users:          players,
 		AvailableItems: make([]Item, 0),
 	}
 }
@@ -48,11 +69,26 @@ func (game *Game) AddToAvailable(item Item) (int, error) {
 }
 
 func (game *Game) GetHost() (Player, error) {
-	for i := 0; i < len(game.Players); i++ {
-		if game.Players[i].IsHost == true {
-			return game.Players[i], nil
+	for i := 0; i < len(game.Users); i++ {
+		if game.Users[i].Player.IsHost == true {
+			return game.Users[i].Player, nil
 		}
 	}
 
-	return Player{}, errors.New("Unable to finda  host")
+	return Player{}, errors.New("Unable to find a  host")
+}
+
+func (game *Game) Players() (players []Player) {
+	for _, user := range game.Users {
+		players = append(players, user.Player)
+	}
+	return
+}
+
+func (game *Game) AddPlayers(users []*User) {
+	for _, user := range users {
+		game.Users = append(game.Users, user)
+	}
+
+	return
 }

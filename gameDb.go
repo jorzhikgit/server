@@ -43,7 +43,7 @@ func (g *GameDbRepo) Save(game Game) (int, error) {
 
 	}
 
-	_, errsEncountered := g.savePlayers(gameId, game.Players...)
+	_, errsEncountered := g.savePlayers(gameId, game.Players()...)
 	if len(errsEncountered) > 0 {
 		return 0, errors.New("Unable to save players to database")
 	}
@@ -104,7 +104,7 @@ func (g *GameDbRepo) FindById(id int) (Game, error) {
 		foundPlayers = append(foundPlayers, Player{Id: playerId, Name: playerName, IsHost: isHost})
 	}
 
-	foundGame.Players = foundPlayers
+	//foundGame.AddPlayers(foundPlayers)
 
 	err = rows.Err()
 	if err != nil {
