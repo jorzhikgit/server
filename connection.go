@@ -10,7 +10,7 @@ type Connection interface {
 	Read() error
 
 	// Write messages to connection
-	Write() error
+	Write(Event Event) error
 
 	CloseChannel() error
 }
@@ -33,7 +33,7 @@ func (w *WsConnection) Read() error {
 	return nil
 }
 
-func (w *WsConnection) Write() error {
+func (w *WsConnection) Write(Event Event) error {
 	return nil
 }
 
