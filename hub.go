@@ -1,26 +1,37 @@
 package main
 
+import (
+	"encoding/json"
+)
+
+const NULL_GAME int = 0
+
 type Hub struct {
 	// A connection mapped to a GameId
-	connections map[Connection]int
+	gameConnections map[int][]*User
 
-	//broadcast chan []byte
+	broadcast chan Event
 
 	// Register connection into hub
-	register chan Connection
+	register chan *User
 
 	// Remove connection from hub
-	unregister chan Connection
+	unregister chan *User
 }
 
-var noGameHub = NewHub()
+type Event struct {
+	GameId   int
+	PlayerId int
+	Type     string
+	Data     json.RawMessage
+}
 
 func NewHub() Hub {
 	return Hub{
-		//broadcast:   make(chan []byte),
-		register:    make(chan Connection),
-		unregister:  make(chan Connection),
-		connections: make(map[Connection]int),
+		broadcast:       make(chan Event),
+		register:        make(chan *User),
+		unregister:      make(chan *User),
+		gameConnections: make(map[int][]*User),
 	}
 }
 
@@ -28,33 +39,29 @@ func NewHub() Hub {
 func (h *Hub) Run() {
 	for {
 		select {
-		case c := <-h.register:
-			h.connections[c] = 0
-		case c := <-h.unregister:
-			if h.checkForConnection(c) {
-				delete(h.connections, c)
-				if err := c.CloseChannel(); err != nil {
-					panic("aw fudge")
+		case u := <-h.register:
+			h.gameConnections[NULL_GAME] = append(h.gameConnections[NULL_GAME], u)
+		//case u := <-h.unregister:
+		case ev := <-h.broadcast:
+			go func(ev Event) {
+				if inGame, ok := h.gameConnections[ev.GameId]; ok {
+					for _, u := range inGame {
+						u.Connection.Write(ev)
+					}
 				}
-			}
+			}(ev)
+
 		}
 	}
 }
 
 // Change a connections game id if they move to a new game
-func (h *Hub) ChangeGame(Conn Connection, GameId int) {
-	h.connections[Conn] = GameId
+func (h *Hub) ChangeGame(User *User, NewGameId int, CurrentGameId int) {
+	h.gameConnections[CurrentGameId] = nil
+	h.gameConnections[NewGameId] = append(h.gameConnections[NewGameId], User)
 }
 
 // Removes game id when a player leaves a game
 func (h *Hub) LeaveGame(Conn Connection) {
-	h.connections[Conn] = 0
-}
-
-func (h *Hub) checkForConnection(conn Connection) bool {
-	if _, ok := h.connections[conn]; ok {
-		return true
-	}
-
-	return false
+	//h.connections[Conn] = 0
 }
