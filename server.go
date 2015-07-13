@@ -25,14 +25,16 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//conn, err := upgrader.Upgrade(w, r, nil)
-	//if err != nil {
-	//log.Println(err)
-	//return
-	//}
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	// create a connection struct
-	//c := &connection{send: make(chan []byte, 256), ws: conn}
+	wsConn := NewWsConnection(ws)
+
+	user := NewUser(wsConn, 0, Player{})
 	// register with hub
 	// go writer
 	// run reader
