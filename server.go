@@ -36,6 +36,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 	user := NewUser(wsConn, 0, Player{})
 	// register with hub
+	gameHub.register <- user
 	// go writer
 	// run reader
 }
