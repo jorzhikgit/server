@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	evbus "github.com/asaskevich/EventBus"
 	"github.com/gorilla/websocket"
 )
 
@@ -17,7 +16,6 @@ var upgrader = websocket.Upgrader{
 // Global game related objects
 var currentGames GameList
 var gameHub Hub
-var events *evbus.EventBus
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
@@ -43,9 +41,6 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	// create db connection
-
-	// event bus
-	events = evbus.New()
 
 	// run hub
 	gameHub = NewHub()
