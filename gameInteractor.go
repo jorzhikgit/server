@@ -8,6 +8,7 @@ type GameInteractor struct {
 	GameRepo         GameRepository
 	Game             Game
 	Logger           Logging
+	Users            []*User
 }
 
 func NewGameInteractor(
@@ -54,4 +55,8 @@ func (gi *GameInteractor) SaveGame() error {
 	}
 
 	return nil
+}
+
+func (gi *GameInteractor) JoinGame(User *User) {
+	gi.Users = append(gi.Users, User)
 }
