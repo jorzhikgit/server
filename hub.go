@@ -10,10 +10,23 @@ type Hub struct {
 	// A connection mapped to a GameId
 	gameConnections map[int][]*User
 
+	// all currently running games
+	runningGames map[int]*GameInteractor
+
+	// connections not in a game
+	notInGame map[*User]bool
+
+	// events to send to connections
 	broadcast chan Event
 
 	// Register connection into hub
 	register chan *User
+
+	// Track a user from not ingame to a game
+	joinGame chan struct {
+		User *User
+		Game *GameInteractor
+	}
 
 	// Remove connection from hub
 	unregister chan *User
@@ -28,9 +41,13 @@ type Event struct {
 
 func NewHub() Hub {
 	return Hub{
-		broadcast:       make(chan Event),
-		register:        make(chan *User),
-		unregister:      make(chan *User),
+		broadcast:  make(chan Event),
+		register:   make(chan *User),
+		unregister: make(chan *User),
+		joinGame: make(chan struct {
+			User *User
+			Game *GameInteractor
+		}),
 		gameConnections: make(map[int][]*User),
 	}
 }
@@ -41,7 +58,9 @@ func (h *Hub) Run() {
 		select {
 		case u := <-h.register:
 			h.gameConnections[NULL_GAME] = append(h.gameConnections[NULL_GAME], u)
-		//case u := <-h.unregister:
+			h.notInGame[u] = true
+		case j := <-h.joinGame:
+			h.JoinGame(j.User, j.Game)
 		case ev := <-h.broadcast:
 			go func(ev Event) {
 				if inGame, ok := h.gameConnections[ev.GameId]; ok {
@@ -61,7 +80,14 @@ func (h *Hub) ChangeGame(User *User, NewGameId int, CurrentGameId int) {
 	h.gameConnections[NewGameId] = append(h.gameConnections[NewGameId], User)
 }
 
-// Removes game id when a player leaves a game
-func (h *Hub) LeaveGame(Conn Connection) {
-	//h.connections[Conn] = 0
+// Attach a user to this game
+func (h *Hub) JoinGame(User *User, Game *GameInteractor) {
+	h.notInGame[User] = false
+
+	gameId := Game.Game.Id
+	if game, ok := h.runningGames[gameId]; ok {
+		game.Users = append(game.Users, User)
+	} else {
+		h.runningGames[gameId] = Game
+	}
 }
