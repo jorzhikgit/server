@@ -1,14 +1,13 @@
 package main
 
-import (
-	"encoding/json"
-)
-
-const NULL_GAME int = 0
+type hub interface {
+	// Manage interactions with connection
+	Run()
+}
 
 type Hub struct {
 	// A connection mapped to a GameId
-	gameConnections map[int][]*User
+	//gameConnections map[int][]*User
 
 	// all currently running games
 	runningGames map[int]*GameInteractor
@@ -32,13 +31,6 @@ type Hub struct {
 	unregister chan *User
 }
 
-type Event struct {
-	GameId   int
-	PlayerId int
-	Type     string
-	Data     json.RawMessage
-}
-
 func NewHub() Hub {
 	return Hub{
 		broadcast:  make(chan Event),
@@ -48,7 +40,8 @@ func NewHub() Hub {
 			User *User
 			Game *GameInteractor
 		}),
-		gameConnections: make(map[int][]*User),
+		notInGame:    make(map[*User]bool),
+		runningGames: make(map[int]*GameInteractor),
 	}
 }
 
@@ -57,27 +50,22 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case u := <-h.register:
-			h.gameConnections[NULL_GAME] = append(h.gameConnections[NULL_GAME], u)
 			h.notInGame[u] = true
 		case j := <-h.joinGame:
 			h.JoinGame(j.User, j.Game)
-		case ev := <-h.broadcast:
-			go func(ev Event) {
-				if inGame, ok := h.gameConnections[ev.GameId]; ok {
-					for _, u := range inGame {
-						u.Connection.Write(ev)
-					}
-				}
-			}(ev)
+			// probably don't need to broadcast, each game interactor
+			// can manage sending to its users
+			//case ev := <-h.broadcast:
+			//	go func(ev Event) {
+			//		if inGame, ok := h.gameConnections[ev.GameId]; ok {
+			//			for _, u := range inGame {
+			//				u.Connection.Write(ev)
+			//			}
+			//		}
+			//	}(ev)
 
 		}
 	}
-}
-
-// Change a connections game id if they move to a new game
-func (h *Hub) ChangeGame(User *User, NewGameId int, CurrentGameId int) {
-	h.gameConnections[CurrentGameId] = nil
-	h.gameConnections[NewGameId] = append(h.gameConnections[NewGameId], User)
 }
 
 // Attach a user to this game
