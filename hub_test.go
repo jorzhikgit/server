@@ -9,12 +9,19 @@ import (
 func TestRegisterWithHub(t *testing.T) {
 	Convey("Given a new hub and user", t, func() {
 		h := NewHub()
-		u := NewUser(FakeConnection{}, 0, Player{})
+		fc := FakeConnection{}
+		u := NewUser(&fc, 0, Player{})
 
 		go h.Run()
 
 		Convey("Pass the user to the registration channel", func() {
 			h.register <- u
+
+			Convey("User should be in the notInGame list", func() {
+				userNotInGame, ok := h.notInGame[u]
+				So(ok, ShouldEqual, true)
+				So(userNotInGame, ShouldEqual, true)
+			})
 		})
 	})
 }
