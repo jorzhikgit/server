@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/boyle-bingo/server/events"
 	"github.com/gorilla/websocket"
 )
 
@@ -12,7 +13,7 @@ type Connection interface {
 	Read() error
 
 	// Write messages to connection
-	Write(Event Event) error
+	Write(Event events.Event) error
 
 	// Close this connection
 	Close() error
@@ -44,7 +45,7 @@ func (w *WsConnection) Read() error {
 }
 
 // Write events back to the user. Events are marshalled into JSON
-func (w *WsConnection) Write(Event Event) error {
+func (w *WsConnection) Write(Event events.Event) error {
 	return nil
 }
 

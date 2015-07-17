@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/boyle-bingo/server/events"
+)
+
 type hub interface {
 	// Manage interactions with connection
 	Run()
@@ -16,7 +20,7 @@ type Hub struct {
 	notInGame map[*User]bool
 
 	// events to send to connections
-	broadcast chan Event
+	broadcast chan events.Event
 
 	// Register connection into hub
 	register chan *User
@@ -33,7 +37,7 @@ type Hub struct {
 
 func NewHub() Hub {
 	return Hub{
-		broadcast:  make(chan Event),
+		broadcast:  make(chan events.Event),
 		register:   make(chan *User),
 		unregister: make(chan *User),
 		joinGame: make(chan struct {
