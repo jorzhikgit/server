@@ -5,8 +5,8 @@ import (
 	//"github.com/smartystreets/goconvey/convey"
 )
 
-type FakeConnection struct{}
+type fakeConnection struct{}
 
-func (fc *FakeConnection) Read() error                    { return nil }
-func (fc *FakeConnection) Write(Event events.Event) error { return nil }
-func (fc *FakeConnection) Close() error                   { return nil }
+func (fc *fakeConnection) Read() error                    { return nil }
+func (fc *fakeConnection) Write(Event events.Event) error { return nil }
+func (fc *fakeConnection) Close() error                   { return nil }

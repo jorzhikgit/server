@@ -9,7 +9,7 @@ import (
 func TestRegisterWithHub(t *testing.T) {
 	Convey("Given a new hub and user", t, func() {
 		h := NewHub()
-		fc := FakeConnection{}
+		fc := fakeConnection{}
 		u := NewUser(&fc, 0, Player{})
 
 		go h.Run()
