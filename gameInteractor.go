@@ -25,6 +25,10 @@ func NewGameInteractor(
 	}
 }
 
+// Handles event parsing for this game
+func (gi *GameInteractor) GameLoop() {
+}
+
 // CreateGame creates a new game from the host's username
 func (gi *GameInteractor) CreateGame(host string, user *User) (Game, error) {
 
