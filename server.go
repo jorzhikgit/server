@@ -1,58 +1,38 @@
 package main
 
 import (
-	"log"
+	//"log"
 	"net/http"
-
-	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin:     func(r *http.Request) bool { return true },
-}
-
-// Global game related objects
-var currentGames GameList
-var gameHub Hub
-
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Method not allowed", 405)
-		return
-	}
-
-	ws, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	// create a connection struct
-	wsConn := NewWsConnection(ws)
-
-	user := NewUser(wsConn, 0, Player{})
-	// register with hub
-	gameHub.register <- user
-	// go writer
-	// run reader
-}
+var AllGames GameList
 
 func main() {
-	// create db connection
 
-	// run hub
-	gameHub = NewHub()
-	go gameHub.Run()
+	AllGames = NewGameList()
 
-	// currently running games
-	currentGames = NewGameList()
+	// create muxer
+	// add route methods
+	http.HandleFunc("/", index)
+	http.HandleFunc("/game/create", createGame)
+	http.HandleFunc("/game/join", joinGame)
 
-	http.HandleFunc("/", rootHandler)
+	http.ListenAndServe(":8080", nil)
 
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
 }
+
+// index simply returns 200 OK
+func index(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Boyle Bingo", "Because why not")
+	w.WriteHeader(200)
+}
+
+type CreateGameRequest struct {
+	UserName string
+	Theme    string
+}
+
+func createGame(w http.ResponseWriter, r *http.Request) {
+}
+
+func joinGame(w http.ResponseWriter, r *http.Request) {}

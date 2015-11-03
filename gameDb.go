@@ -47,7 +47,7 @@ func (g *GameDbRepo) Save(game Game) (int, error) {
 
 	}
 
-	_, errsEncountered := g.savePlayers(gameID, game.Players()...)
+	_, errsEncountered := g.savePlayers(gameID, game.Players...)
 	if len(errsEncountered) > 0 {
 		return 0, errors.New("Unable to save players to database")
 	}
@@ -57,8 +57,8 @@ func (g *GameDbRepo) Save(game Game) (int, error) {
 }
 
 // savePlayers saves all the players to a map associated with a game
-func (g *GameDbRepo) savePlayers(gameID int, players ...Player) ([]Player, []error) {
-	savedPlayers := make([]Player, 0)
+func (g *GameDbRepo) savePlayers(gameID int, players ...*Player) ([]*Player, []error) {
+	savedPlayers := make([]*Player, 0)
 	errorsFound := make([]error, 0)
 
 	query := "INSERT INTO `games_players` (`game_id`,`player_id`) VALUES (?,?)"
